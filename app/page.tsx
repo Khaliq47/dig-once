@@ -1,67 +1,66 @@
 import Link from "next/link";
+import RoadStory from "@/components/RoadStory";
 
-const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-
-const works = [
-  { name: "Resurfacing", dept: "Roads", from: 1, to: 2, style: "bg-ink text-white" },
-  { name: "Water pipeline", dept: "Water Board", from: 3, to: 4, style: "border-2 border-hazard bg-white text-ink" },
-  { name: "Drain repair", dept: "Drainage", from: 5, to: 6, style: "border border-line bg-white text-ink" },
+const audiences = [
+  {
+    title: "Residents",
+    text: "Check any street. See who is digging, why, and when it ends.",
+    href: "/search",
+    link: "Find work near me",
+  },
+  {
+    title: "Departments",
+    text: "Submit planned work and see conflicts with other departments before the first cut.",
+    href: "/department",
+    link: "Open the department portal",
+  },
+  {
+    title: "The city",
+    text: "Rank departments and contractors by on-time work, delays and repeat digs.",
+    href: "/dashboard",
+    link: "See the accountability dashboard",
+  },
 ];
 
 export default function Home() {
   return (
-    <main className="mx-auto grid max-w-6xl gap-10 px-4 py-12 lg:grid-cols-2 lg:items-center lg:py-20">
-      <section>
-        <h1 className="font-display text-6xl font-bold leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl">
-          One road,
-          <br />
-          dug once.
-        </h1>
-        <p className="mt-6 max-w-md text-lg text-muted">
-          See what is planned on your street, who is doing it, and whether it is on schedule.
-          Departments see all planned work before the digging starts.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/search" className="rounded-sm bg-ink px-5 py-3 font-medium text-white">
-            Find work near me
-          </Link>
-          <Link href="/map" className="rounded-sm border border-ink px-5 py-3 font-medium">
-            Open the map
-          </Link>
+    <main>
+      <section className="on-dark bg-ink text-white">
+        <div className="mx-auto max-w-6xl px-4 pb-10 pt-14 lg:pt-20">
+          <h1 className="font-display text-[clamp(4rem,13vw,10rem)] font-bold leading-[0.88] tracking-tight">
+            One road,
+            <br />
+            dug once.
+          </h1>
+          <p className="mt-6 max-w-xl text-lg text-white/70">
+            See what is planned on your street, who is doing it, and whether it is on schedule.
+            Departments see all planned work before the digging starts.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link href="/search" className="rounded-sm bg-white px-5 py-3 font-medium text-ink">
+              Find work near me
+            </Link>
+            <Link href="/map" className="rounded-sm border border-white px-5 py-3 font-medium">
+              Open the map
+            </Link>
+          </div>
         </div>
+        <RoadStory />
       </section>
 
-      <section aria-label="Example road timeline" className="border border-line bg-white p-5">
-        <p className="font-display text-xl font-semibold">Station Road, sample segment</p>
-        <p className="mb-4 text-sm text-muted">Three departments, six months</p>
-
-        <div className="grid grid-cols-6 gap-1 text-xs text-muted">
-          {months.map((m) => (
-            <span key={m}>{m}</span>
-          ))}
-        </div>
-
-        <div className="mt-2 space-y-2">
-          {works.map((w) => (
-            <div key={w.name} className="grid grid-cols-6 gap-1">
-              <div
-                className={`rounded-sm px-2 py-2 text-sm ${w.style}`}
-                style={{ gridColumn: `${w.from} / ${w.to + 1}` }}
-              >
-                <span className="font-medium">{w.name}</span>
-                <span className="block text-xs opacity-70">{w.dept}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="mt-5 flex">
-          <div className="hazard-stripe w-2 shrink-0" aria-hidden="true" />
-          <p className="bg-ground p-3 text-sm">
-            <strong>Conflict found.</strong> The pipeline starts one month after resurfacing ends.
-            Suggested fix: lay the pipeline first, or bundle both into one work window.
-          </p>
-        </div>
+      <section className="mx-auto grid max-w-6xl gap-0 px-4 py-14 md:grid-cols-3">
+        {audiences.map((a, i) => (
+          <div
+            key={a.title}
+            className={`py-4 md:px-6 ${i > 0 ? "border-t border-line md:border-l md:border-t-0" : "md:pl-0"}`}
+          >
+            <h2 className="font-display text-3xl font-semibold">{a.title}</h2>
+            <p className="mt-2 text-muted">{a.text}</p>
+            <Link href={a.href} className="mt-3 inline-block font-medium underline underline-offset-4">
+              {a.link}
+            </Link>
+          </div>
+        ))}
       </section>
     </main>
   );
