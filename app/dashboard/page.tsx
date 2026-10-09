@@ -1,3 +1,12 @@
+import DashboardView from "@/components/DashboardView";
+import { departmentsDummy, contractorsDummy } from "@/lib/dummy-accountability";
+
 export default function Page() {
-  return <main className="p-6">Accountability (Khaliq)</main>;
+  return (
+    <DashboardView
+      departments={departmentsDummy}
+      contractors={contractorsDummy}
+      isSample
+    />
+  );
 }

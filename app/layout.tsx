@@ -1,6 +1,14 @@
 import type { Metadata } from "next";
+import { Barlow_Condensed, Public_Sans } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+
+const display = Barlow_Condensed({
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-barlow",
+});
+const body = Public_Sans({ subsets: ["latin"], variable: "--font-public" });
 
 export const metadata: Metadata = {
   title: "DigOnce: one road, dug once",
@@ -10,7 +18,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>
+      <body className={`${display.variable} ${body.variable} font-sans antialiased`}>
         <Navbar />
         {children}
       </body>
