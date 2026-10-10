@@ -27,7 +27,10 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 font-display text-4xl font-bold">Login</h1>
+      <h1 className="mb-2 font-display text-4xl font-bold">Login</h1>
+      <p className="mb-4 text-sm text-muted">
+      Residents can browse without logging in. The department portal needs a department account, so use the demo button below.
+      </p>
 
       <div className="mb-6 flex flex-col gap-2">
         <button
