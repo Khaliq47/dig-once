@@ -1,8 +1,6 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
-import { use, useEffect, useState } from "react";
+import { use, useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import ProjectReports from "@/components/reports/ProjectReports";
@@ -22,11 +20,7 @@ type ProjectRow = {
   summary_en: string | null;
 };
 
-export default function ProjectPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+function ProjectContent({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const [project, setProject] = useState<ProjectRow | null>(null);
   const [error, setError] = useState("");
@@ -94,5 +88,17 @@ export default function ProjectPage({
         <ProjectReports projectId={project.id} />
       </section>
     </main>
+  );
+}
+
+export default function ProjectPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  return (
+    <Suspense fallback={<main className="mx-auto max-w-4xl p-6 text-muted">Loading...</main>}>
+      <ProjectContent params={params} />
+    </Suspense>
   );
 }
