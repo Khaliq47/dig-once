@@ -7,7 +7,7 @@ import { useSession } from "@/lib/reports/useSession";
 import { type Report, REPORT_COLUMNS } from "@/lib/reports/reportStatus";
 import ReportCard from "./ReportCard";
 
-export default function ProjectReports({ projectId }: { projectId: string }) {
+export default function ProjectReports({ projectId }: { projectId: string | number }) {
   const { userId } = useSession();
   const [reports, setReports] = useState<Report[] | null>(null);
 

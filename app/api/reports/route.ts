@@ -16,7 +16,8 @@ export async function POST(req: Request) {
   }
 
   const lat = Number(b.lat), lng = Number(b.lng);
-  if (!UUID.test(b.project_id ?? "")) return bad("Choose a project");
+  const pid = Number(b.project_id);
+  if (!Number.isInteger(pid) || pid <= 0) return bad("Choose a project");
   if (!CATEGORIES.includes(b.category)) return bad("Choose a category");
   if (!SOURCES.includes(b.location_source)) return bad("Location source is missing");
   if (!Number.isFinite(lat) || !Number.isFinite(lng)) return bad("Location is missing");
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
   const asUser = supabaseAsUser(token);
   const { data: report, error } = await asUser
     .rpc("submit_report", {
-      p_project_id: b.project_id,
+      p_project_id: pid,
       p_category: b.category,
       p_note: b.note ?? null,
       p_photo_path: b.photo_path ?? null,
