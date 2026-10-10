@@ -31,21 +31,21 @@ export default function ReportsPage() {
     <main className="mx-auto max-w-2xl space-y-5 p-4 pb-16">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Resident reports</h1>
-        <Link href="/reports/new" className="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">Report a problem</Link>
+        <Link href="/reports/new" className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white">Report a problem</Link>
       </div>
 
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter reports">
         {FILTERS.map((f) => (
           <button key={f.value} onClick={() => setFilter(f.value)} aria-pressed={filter === f.value}
-            className={`rounded-full border px-3 py-1 text-sm ${filter === f.value ? "border-slate-900 bg-slate-900 text-white" : "border-slate-300"}`}>
+            className={`rounded-full border px-3 py-1 text-sm ${filter === f.value ? "border-blue-600 bg-blue-600 text-white" : "border-slate-500/50"}`}>
             {f.label}
           </button>
         ))}
       </div>
 
-      {reports === null && <p className="text-slate-500">Loading reports...</p>}
+      {reports === null && <p className="opacity-60">Loading reports...</p>}
       {shown?.length === 0 && (
-        <p className="rounded-lg bg-slate-50 p-4 text-slate-600">
+        <p className="rounded-lg bg-slate-500/10 p-4 opacity-75">
           No reports here yet. Report a problem to start one.
         </p>
       )}

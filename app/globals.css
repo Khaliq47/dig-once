@@ -121,3 +121,6 @@ body::before {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
 }
+html body select, html body select option { color: #eab308 !important; -webkit-text-fill-color: #eab308 !important; }
+
+html body select, html body select option { color: #eab308 !important; -webkit-text-fill-color: #eab308 !important; }

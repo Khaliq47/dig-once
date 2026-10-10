@@ -12,19 +12,19 @@ export default function ReportTimeline({ reportId, refreshKey = 0 }: { reportId:
       .then(({ data }) => setEvents((data as ReportEvent[]) ?? []));
   }, [reportId, refreshKey]);
 
-  if (!events) return <p className="text-sm text-slate-500">Loading progress...</p>;
-  if (events.length === 0) return <p className="text-sm text-slate-500">No updates yet.</p>;
+  if (!events) return <p className="text-sm opacity-60">Loading progress...</p>;
+  if (events.length === 0) return <p className="text-sm opacity-60">No updates yet.</p>;
 
   return (
-    <ol className="relative ml-2 space-y-4 border-l-2 border-slate-200 pl-5">
+    <ol className="relative ml-2 space-y-4 border-l-2 border-slate-500/30 pl-5">
       {events.map((e) => {
         const s = STATUS_STYLE[e.status as ReportStatus];
         return (
           <li key={e.id} className="relative">
-            <span className="absolute -left-[27px] top-1 h-3 w-3 rounded-full bg-slate-900 ring-4 ring-white" />
+            <span className="absolute -left-[27px] top-1 h-3 w-3 rounded-full bg-blue-600 ring-4 ring-transparent" />
             <p className="font-medium">{s?.label ?? e.status}</p>
-            {e.note && <p className="text-sm text-slate-600">{e.note}</p>}
-            <p className="text-xs text-slate-400">{timeAgo(e.created_at)}</p>
+            {e.note && <p className="text-sm opacity-75">{e.note}</p>}
+            <p className="text-xs opacity-50">{timeAgo(e.created_at)}</p>
           </li>
         );
       })}

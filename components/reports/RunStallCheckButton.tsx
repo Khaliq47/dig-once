@@ -22,10 +22,10 @@ export default function RunStallCheckButton({ onDone }: { onDone?: () => void })
 
   return (
     <div className="flex items-center gap-3">
-      <button onClick={run} disabled={busy || !token} className="rounded-lg border border-slate-300 px-4 py-2 disabled:opacity-60">
+      <button onClick={run} disabled={busy || !token} className="rounded-lg border border-slate-500/50 px-4 py-2 disabled:opacity-60">
         {busy ? "Checking..." : "Run stall check now"}
       </button>
-      {msg && <span role="status" className="text-sm text-slate-600">{msg}</span>}
+      {msg && <span role="status" className="text-sm opacity-75">{msg}</span>}
     </div>
   );
 }

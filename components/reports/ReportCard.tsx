@@ -29,11 +29,11 @@ export default function ReportCard({
   const pct = Math.min(100, Math.max(0, (r.trust_score / VERIFY_THRESHOLD) * 100));
 
   return (
-    <article className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
+    <article className="space-y-3 rounded-xl border border-slate-500/30 bg-slate-500/10 p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-medium">{label}</h3>
-          <p className="text-xs text-slate-500">{timeAgo(r.created_at)}</p>
+          <p className="text-xs opacity-60">{timeAgo(r.created_at)}</p>
         </div>
         <span className={`shrink-0 rounded-full px-3 py-1 text-xs ring-1 ${s.cls}`}>{s.label}</span>
       </div>
@@ -41,14 +41,14 @@ export default function ReportCard({
       {img && <img src={img} alt={`Photo for report: ${label}`} loading="lazy"
         className="max-h-64 w-full rounded-lg object-cover" />}
 
-      {r.note && <p className="text-slate-700">{r.note}</p>}
+      {r.note && <p className="opacity-80">{r.note}</p>}
 
       <div className="flex flex-wrap gap-2 text-xs">
         {r.ai_status === "classified" && r.ai_category && (
-          <span className="rounded bg-slate-100 px-2 py-1">Photo looks like: {AI_LABELS[r.ai_category]}</span>
+          <span className="rounded bg-slate-500/100/20 px-2 py-1">Photo looks like: {AI_LABELS[r.ai_category]}</span>
         )}
         {r.ai_status === "unclassified" && r.photo_path && (
-          <span className="rounded bg-slate-100 px-2 py-1 text-slate-500">Photo not classified</span>
+          <span className="rounded bg-slate-500/100/20 px-2 py-1 opacity-60">Photo not classified</span>
         )}
         {r.duplicate_of && (
           <Link href={`/reports/${r.duplicate_of}`} className="rounded bg-amber-50 px-2 py-1 text-amber-800 underline">
@@ -59,10 +59,10 @@ export default function ReportCard({
 
       {r.status === "submitted" && (
         <div>
-          <div className="mb-1 flex justify-between text-xs text-slate-500">
+          <div className="mb-1 flex justify-between text-xs opacity-60">
             <span>Needs more confirmations to be verified</span><span>{Math.max(0, r.trust_score)}/{VERIFY_THRESHOLD}</span>
           </div>
-          <div className="h-2 rounded-full bg-slate-100" role="progressbar" aria-valuenow={Math.round(pct)}
+          <div className="h-2 rounded-full bg-slate-500/100/20" role="progressbar" aria-valuenow={Math.round(pct)}
             aria-valuemin={0} aria-valuemax={100} aria-label="Verification progress">
             <div className="h-2 rounded-full bg-emerald-500" style={{ width: `${pct}%` }} />
           </div>
