@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -126,7 +126,7 @@ export default function ReportForm({ projectId }: { projectId?: string }) {
           lat: loc.lat, lng: loc.lng, location_source: loc.source, photo_path,
         }),
       });
-      const json = await res.json();
+      const json = await res.json().catch(() => ({ error: "Server error. Please try again." }));
       if (!res.ok) throw new Error(json.error || "Could not submit the report.");
       setResult(json as Report);
     } catch (err: any) {
@@ -230,5 +230,6 @@ export default function ReportForm({ projectId }: { projectId?: string }) {
     </form>
   );
 }
+
 
 
