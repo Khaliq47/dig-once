@@ -18,7 +18,7 @@ export default function AuthButton() {
 
   if (!email) {
     return (
-      <Link href="/login" className="ml-auto rounded bg-black px-3 py-1 text-sm text-white">
+      <Link href="/login" className="ml-auto rounded-sm bg-ink px-3 py-1 text-sm font-medium text-white">
         Login
       </Link>
     );
@@ -26,14 +26,14 @@ export default function AuthButton() {
 
   return (
     <div className="ml-auto flex items-center gap-3 text-sm">
-      <span className="text-gray-600">{email}</span>
+      <span className="text-muted">{email}</span>
       <button
         onClick={async () => {
           await supabase.auth.signOut();
           router.push("/");
           router.refresh();
         }}
-        className="rounded border px-3 py-1"
+        className="rounded-sm border border-ink px-3 py-1 hover:bg-ink hover:text-white"
       >
         Logout
       </button>
