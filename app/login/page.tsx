@@ -27,20 +27,20 @@ export default function LoginPage() {
 
   return (
     <main className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 text-2xl font-bold">Login</h1>
+      <h1 className="mb-4 font-display text-4xl font-bold">Login</h1>
 
       <div className="mb-6 flex flex-col gap-2">
         <button
           disabled={loading}
           onClick={() => signIn("citizen@demo.com", DEMO_PASSWORD, "/map")}
-          className="rounded bg-blue-600 px-4 py-2 text-white disabled:opacity-50"
+          className="rounded-sm bg-ink px-4 py-2 font-medium text-white disabled:opacity-50"
         >
           Login as Citizen (demo)
         </button>
         <button
           disabled={loading}
           onClick={() => signIn("dept@demo.com", DEMO_PASSWORD, "/department")}
-          className="rounded bg-green-700 px-4 py-2 text-white disabled:opacity-50"
+          className="rounded-sm border border-ink bg-white px-4 py-2 font-medium disabled:opacity-50"
         >
           Login as Department (demo)
         </button>
@@ -52,23 +52,23 @@ export default function LoginPage() {
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="rounded border px-3 py-2"
+          className="rounded-sm border border-line bg-white px-3 py-2"
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="rounded border px-3 py-2"
+          className="rounded-sm border border-line bg-white px-3 py-2"
         />
         <button
           disabled={loading}
           onClick={() => signIn(email, password, "/")}
-          className="rounded bg-black px-4 py-2 text-white disabled:opacity-50"
+          className="rounded-sm bg-ink px-4 py-2 text-white disabled:opacity-50"
         >
           Login
         </button>
-        {error && <p className="text-sm text-red-600">{error}</p>}
+        {error && <p className="text-sm text-delayed">{error}</p>}
       </div>
     </main>
   );
