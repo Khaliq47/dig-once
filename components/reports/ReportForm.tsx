@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
@@ -175,7 +175,7 @@ export default function ReportForm({ projectId }: { projectId?: string }) {
       {!projectId && (
         <label className="block">
           <span className="mb-1 block font-medium">Project</span>
-          <select className="w-full rounded-lg border border-slate-500/50 !bg-slate-800 p-2.5 !text-white" value={project}
+          <select className="w-full rounded-lg border border-slate-500/50 !bg-slate-800 p-2.5 !text-yellow-500" value={project}
             onChange={(e) => setProject(e.target.value)} required>
             <option className="!bg-slate-900 !text-yellow-500" value="">Choose a project</option>
             {projects.map((p) => <option className="!bg-slate-900 !text-yellow-500" key={p.id} value={p.id}>{p.title}</option>)}
@@ -185,7 +185,7 @@ export default function ReportForm({ projectId }: { projectId?: string }) {
 
       <label className="block">
         <span className="mb-1 block font-medium">What is wrong?</span>
-        <select className="w-full rounded-lg border border-slate-500/50 !bg-slate-800 p-2.5 !text-white" value={category}
+        <select className="w-full rounded-lg border border-slate-500/50 !bg-slate-800 p-2.5 !text-yellow-500" value={category}
           onChange={(e) => setCategory(e.target.value)} required>
           <option className="!bg-slate-900 !text-yellow-500" value="">Choose one</option>
           {CATEGORIES.map((c) => <option className="!bg-slate-900 !text-yellow-500" key={c.value} value={c.value}>{c.label}</option>)}
@@ -218,7 +218,7 @@ export default function ReportForm({ projectId }: { projectId?: string }) {
 
       <label className="block">
         <span className="mb-1 block font-medium">Details <span className="font-normal opacity-60">(optional)</span></span>
-        <textarea className="w-full rounded-lg border border-slate-500/50 !bg-slate-800 p-2.5 !text-white" rows={3} maxLength={1000}
+        <textarea style={{ color: "#eab308", WebkitTextFillColor: "#eab308", caretColor: "#eab308" }} className="w-full rounded-lg border border-slate-500/50 !bg-slate-800 p-2.5 !text-yellow-500" rows={3} maxLength={1000}
           value={note} onChange={(e) => setNote(e.target.value)} />
       </label>
 
@@ -230,6 +230,9 @@ export default function ReportForm({ projectId }: { projectId?: string }) {
     </form>
   );
 }
+
+
+
 
 
 
