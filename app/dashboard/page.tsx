@@ -31,6 +31,8 @@ async function DashboardData() {
   ]);
 
   if (depts.error || contractors.error) {
+    console.error("Accountability departments error:", depts.error);
+    console.error("Accountability contractors error:", contractors.error);
     return (
       <main className="mx-auto max-w-6xl p-6">
         <h1 className="font-display text-4xl font-bold">Accountability dashboard</h1>
