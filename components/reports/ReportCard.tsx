@@ -1,11 +1,11 @@
-"use client";
+﻿"use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser as supabase } from "@/lib/reports/client";
 import {
   type Report, REPORT_COLUMNS, STATUS_STYLE, AI_LABELS, CATEGORIES, VERIFY_THRESHOLD, photoUrl, timeAgo,
 } from "@/lib/reports/reportStatus";
-import VoteButtons from "./VoteButtons";
+import VoteButtons from "./VoteButtons"; import { useIsDept } from "./useIsDept";
 import ReportTimeline from "./ReportTimeline";
 
 export default function ReportCard({
@@ -13,7 +13,7 @@ export default function ReportCard({
 }: { report: Report; userId: string | null; startOpen?: boolean; onChange?: () => void }) {
   const [r, setR] = useState(report);
   const [open, setOpen] = useState(startOpen);
-  const [tick, setTick] = useState(0);
+  const [tick, setTick] = useState(0); const isDept = useIsDept(userId);
   useEffect(() => setR(report), [report]);
 
   async function refresh() {
@@ -57,7 +57,7 @@ export default function ReportCard({
         )}
       </div>
 
-      {r.status === "submitted" && (
+      {r.status === "submitted" && !isDept && (
         <div>
           <div className="mb-1 flex justify-between text-xs opacity-60">
             <span>Needs more confirmations to be verified</span><span>{Math.max(0, r.trust_score)}/{VERIFY_THRESHOLD}</span>
@@ -75,7 +75,7 @@ export default function ReportCard({
         </p>
       )}
 
-      <VoteButtons report={r} userId={userId} onVoted={refresh} />
+      {!isDept && <VoteButtons report={r} userId={userId} onVoted={refresh} />}
 
       <button className="text-sm underline" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         {open ? "Hide progress" : "Show progress"}
@@ -84,3 +84,4 @@ export default function ReportCard({
     </article>
   );
 }
+

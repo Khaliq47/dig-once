@@ -1,10 +1,10 @@
-"use client";
+﻿"use client";
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabaseBrowser as supabase } from "@/lib/reports/client";
 import { useSession } from "@/lib/reports/useSession";
 import { type Report, type ReportStatus, REPORT_COLUMNS, STATUS_STYLE } from "@/lib/reports/reportStatus";
-import ReportCard from "@/components/reports/ReportCard";
+import ReportCard from "@/components/reports/ReportCard"; import { useIsDept } from "@/components/reports/useIsDept";
 
 const FILTERS: { value: "all" | ReportStatus; label: string }[] = [
   { value: "all", label: "All" },
@@ -14,7 +14,7 @@ const FILTERS: { value: "all" | ReportStatus; label: string }[] = [
 ];
 
 export default function ReportsPage() {
-  const { userId } = useSession();
+  const { userId } = useSession(); const isDept = useIsDept(userId);
   const [reports, setReports] = useState<Report[] | null>(null);
   const [filter, setFilter] = useState<"all" | ReportStatus>("all");
 
@@ -31,7 +31,7 @@ export default function ReportsPage() {
     <main className="mx-auto max-w-2xl space-y-5 p-4 pb-16">
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-2xl font-semibold">Resident reports</h1>
-        <Link href="/reports/new" className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white">Report a problem</Link>
+        {!isDept && <Link href="/reports/new" className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white">Report a problem</Link>}
       </div>
 
       <div className="flex flex-wrap gap-2" role="group" aria-label="Filter reports">
@@ -53,3 +53,4 @@ export default function ReportsPage() {
     </main>
   );
 }
+
