@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import RunStallCheckButton from "@/components/reports/RunStallCheckButton";
 import type { Project, Report, ProjectStatus } from "@/lib/types";
 
 type ManageProject = Omit<Project, "geom">;
@@ -33,6 +34,7 @@ export default function DepartmentManage() {
   const [aiLoading, setAiLoading] = useState(false);
 
   const selected = projects.find((p) => p.id === selectedId) ?? null;
+  const stalled = projects.filter((p) => (p.status as string) === "possibly_stalled");
 
   function pick(p: ManageProject) {
     setSelectedId(p.id);
@@ -42,6 +44,17 @@ export default function DepartmentManage() {
       delay_reason: p.delay_reason ?? "",
     });
     setMessage("");
+  }
+
+  // reload this department's projects after the stall check has run
+  async function refreshProjects() {
+    if (!departmentName) return;
+    const { data } = await supabase
+      .from("projects")
+      .select(PROJECT_COLUMNS)
+      .eq("department", departmentName)
+      .order("id");
+    if (data) setProjects(data as ManageProject[]);
   }
 
   useEffect(() => {
@@ -215,6 +228,35 @@ export default function DepartmentManage() {
         Update status, progress and delay reasons. Residents see these changes on the project pages.
       </p>
 
+      <section className="mb-6 border border-line bg-white p-4">
+        <h2 className="mb-1 font-display text-2xl font-semibold">Stall check</h2>
+        <p className="mb-3 text-sm text-muted">
+          Flags projects where verified resident reports disagree with the official status, or where
+          nothing has happened since the start date.
+        </p>
+        <RunStallCheckButton onDone={refreshProjects} />
+        <h3 className="mb-2 mt-4 text-sm font-medium">Possibly stalled ({stalled.length})</h3>
+        {stalled.length === 0 ? (
+          <p className="text-sm text-muted">No stalled projects.</p>
+        ) : (
+          <ul className="space-y-2">
+            {stalled.map((p) => (
+              <li key={p.id}>
+                <button
+                  onClick={() => pick(p)}
+                  className="w-full border border-stalled px-3 py-2 text-left text-sm"
+                >
+                  <span className="font-medium">{p.title}</span>
+                  <span className="text-muted">
+                    {p.road_id !== null && roadNames[p.road_id] ? `, ${roadNames[p.road_id]}` : ""}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
       {projects.length === 0 ? (
         <p className="border border-line bg-white p-4 text-sm text-muted">
           No projects found for {departmentName}.
@@ -238,7 +280,9 @@ export default function DepartmentManage() {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <span className="font-medium">{p.title}</span>
-                        <span className={`border px-2 text-xs ${statusStyle[st]}`}>{st}</span>
+                        <span className={`border px-2 text-xs ${statusStyle[st] ?? "border-stalled text-stalled"}`}>
+                          {String(st).replace("_", " ")}
+                        </span>
                       </div>
                       <p className="text-sm text-muted">
                         {p.road_id !== null && roadNames[p.road_id] ? roadNames[p.road_id] : "Road not linked"}
@@ -275,6 +319,9 @@ export default function DepartmentManage() {
                     onChange={(e) => setForm({ ...form, status: e.target.value as ProjectStatus })}
                     className="mt-1 block w-full rounded-sm border border-line bg-white px-2 py-2"
                   >
+                    {(form.status as string) === "possibly_stalled" && (
+                      <option value="possibly_stalled">possibly stalled</option>
+                    )}
                     {statuses.map((s) => (
                       <option key={s} value={s}>{s}</option>
                     ))}
