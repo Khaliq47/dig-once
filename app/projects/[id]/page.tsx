@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import ProjectReports from "@/components/reports/ProjectReports";
@@ -21,25 +20,31 @@ type ProjectRow = {
   summary_en: string | null;
 };
 
-export default function ProjectPage() {
-  const params = useParams<{ id: string }>();
+export default function ProjectPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const resolvedParams = use(params);
   const [project, setProject] = useState<ProjectRow | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
+      if (!resolvedParams?.id) return;
       const { data, error } = await supabase
         .from("projects")
         .select("id,title,type,department,contractor,budget,start_date,end_date,status,progress,delay_reason,summary_en")
-        .eq("id", Number(params.id))
+        .eq("id", Number(resolvedParams.id))
         .single();
+
       if (error || !data) setError("Project not found.");
       else setProject(data as ProjectRow);
       setLoading(false);
     }
     load();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   if (loading) return <main className="mx-auto max-w-4xl p-6 text-muted">Loading project...</main>;
   if (error || !project) {
