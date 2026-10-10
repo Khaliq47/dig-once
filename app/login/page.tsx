@@ -21,8 +21,7 @@ export default function LoginPage() {
       setError(error.message);
       return;
     }
-    router.push(redirectTo);
-    router.refresh();
+    window.location.assign(redirectTo);
   }
 
   return (
