@@ -11,6 +11,13 @@ export default function VoteButtons({
   const [mine, setMine] = useState<Vote>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [isDept, setIsDept] = useState(false);
+
+  useEffect(() => {
+    if (!userId) return;
+    supabase.from("profiles").select("role").eq("id", userId).maybeSingle()
+      .then(({ data }) => setIsDept(data?.role === "department"));
+  }, [userId]);
 
   useEffect(() => {
     if (!userId) return;
@@ -19,6 +26,7 @@ export default function VoteButtons({
   }, [report.id, userId]);
 
   if (!userId) return <p className="text-sm opacity-60">Log in to confirm or dispute this report.</p>;
+  if (isDept) return <p className="text-sm opacity-60">Residents confirm reports. Departments act on them.</p>;
   if (report.user_id === userId) return <p className="text-sm opacity-60">You submitted this report.</p>;
   if (report.status !== "submitted") return <p className="text-sm opacity-60">Voting is closed for this report.</p>;
 
