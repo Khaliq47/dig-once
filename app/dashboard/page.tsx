@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { connection } from "next/server";
 import DashboardView from "@/components/DashboardView";
 import { createSupabaseServer } from "@/lib/supabase-server";
 import type { AccountabilityRow } from "@/lib/accountability";
@@ -22,6 +23,7 @@ function toRow(r: DbRow): AccountabilityRow {
 }
 
 async function DashboardData() {
+  await connection();
   const supabase = await createSupabaseServer();
   const [depts, contractors] = await Promise.all([
     supabase.from("accountability_departments").select("*"),
