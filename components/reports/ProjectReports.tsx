@@ -23,13 +23,13 @@ export default function ProjectReports({ projectId }: { projectId: string | numb
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Resident reports</h2>
-        <Link href={`/reports/new?project=${projectId}`} className="rounded-lg bg-slate-900 px-4 py-2 text-sm text-white">
+        <Link href={`/reports/new?project=${projectId}`} className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white">
           Report a problem
         </Link>
       </div>
-      {reports === null && <p className="text-slate-500">Loading reports...</p>}
+      {reports === null && <p className="opacity-60">Loading reports...</p>}
       {reports?.length === 0 && (
-        <p className="rounded-lg bg-slate-50 p-4 text-slate-600">
+        <p className="rounded-lg bg-slate-500/10 p-4 opacity-75">
           No reports yet. If you can see this site, add a photo and tell others what is happening.
         </p>
       )}

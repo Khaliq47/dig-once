@@ -18,9 +18,9 @@ export default function VoteButtons({
       .maybeSingle().then(({ data }) => setMine((data?.vote as Vote) ?? null));
   }, [report.id, userId]);
 
-  if (!userId) return <p className="text-sm text-slate-500">Log in to confirm or dispute this report.</p>;
-  if (report.user_id === userId) return <p className="text-sm text-slate-500">You submitted this report.</p>;
-  if (report.status !== "submitted") return <p className="text-sm text-slate-500">Voting is closed for this report.</p>;
+  if (!userId) return <p className="text-sm opacity-60">Log in to confirm or dispute this report.</p>;
+  if (report.user_id === userId) return <p className="text-sm opacity-60">You submitted this report.</p>;
+  if (report.status !== "submitted") return <p className="text-sm opacity-60">Voting is closed for this report.</p>;
 
   async function vote(v: "confirm" | "dispute") {
     setBusy(true); setError("");
@@ -40,15 +40,15 @@ export default function VoteButtons({
     <div>
       <div className="flex gap-2">
         <button disabled={busy} onClick={() => vote("confirm")} aria-pressed={mine === "confirm"}
-          className={`${base} ${mine === "confirm" ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-300"}`}>
+          className={`${base} ${mine === "confirm" ? "border-emerald-600 bg-emerald-600 text-white" : "border-slate-500/50"}`}>
           I see this too ({report.confirm_count})
         </button>
         <button disabled={busy} onClick={() => vote("dispute")} aria-pressed={mine === "dispute"}
-          className={`${base} ${mine === "dispute" ? "border-rose-600 bg-rose-600 text-white" : "border-slate-300"}`}>
+          className={`${base} ${mine === "dispute" ? "border-rose-600 bg-rose-600 text-white" : "border-slate-500/50"}`}>
           This is wrong ({report.dispute_count})
         </button>
       </div>
-      {error && <p role="alert" className="mt-2 text-sm text-rose-700">{error}</p>}
+      {error && <p role="alert" className="mt-2 text-sm text-rose-500">{error}</p>}
     </div>
   );
 }

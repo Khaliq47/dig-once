@@ -8,7 +8,7 @@ function Inner() {
   return (
     <main className="mx-auto max-w-xl space-y-5 p-4 pb-16">
       <h1 className="text-2xl font-semibold">Report a problem with public works</h1>
-      <p className="text-slate-600">Add a photo and where it is. Nearby residents can confirm it, and once verified it goes to the department.</p>
+      <p className="opacity-75">Add a photo and where it is. Nearby residents can confirm it, and once verified it goes to the department.</p>
       <ReportForm projectId={projectId} />
     </main>
   );
