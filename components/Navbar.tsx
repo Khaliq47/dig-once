@@ -11,9 +11,9 @@ const links = [
 
 export default function Navbar() {
   return (
-    <header>
+    <header className="sticky top-0 z-40 bg-ground">
       <div className="hazard-stripe h-2" aria-hidden="true" />
-      <nav className="border-b border-line bg-white">
+      <nav className="border-b border-line">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <Link href="/" className="font-display text-3xl font-bold leading-none tracking-tight">
             DigOnce
@@ -23,7 +23,7 @@ export default function Navbar() {
               <Link
                 key={l.href}
                 href={l.href}
-                className="py-1 underline-offset-4 hover:text-ink hover:underline"
+                className="py-1 underline-offset-4 decoration-hazard hover:text-ink hover:underline"
               >
                 {l.label}
               </Link>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createSupabaseServer } from "@/lib/supabase-server";
 import { generateText } from "@/lib/gemini";
 import { buildPrompt, type AiKind } from "@/lib/ai-prompts";
+export const maxDuration = 30;
 
 const KINDS: AiKind[] = ["notice_summary", "delay_draft", "report_summary"];
 

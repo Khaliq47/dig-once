@@ -73,11 +73,22 @@ export default function DashboardView({
       <div className="h-80 w-full border border-line bg-white p-3">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={sorted} layout="vertical" margin={{ left: 20 }}>
-            <CartesianGrid stroke="#C9CFD6" strokeDasharray="3 3" />
-            <XAxis type="number" />
-            <YAxis type="category" dataKey="name" width={160} />
-            <Tooltip />
-            <Bar dataKey={metricKey} fill="#1B2430" />
+            <CartesianGrid stroke="#2E2A25" strokeDasharray="3 3" />
+            <XAxis type="number" stroke="#9A9388" tick={{ fill: "#9A9388" }} />
+            <YAxis
+              type="category"
+              dataKey="name"
+              width={160}
+              stroke="#9A9388"
+              tick={{ fill: "#ECE6DA" }}
+            />
+            <Tooltip
+              cursor={{ fill: "#2A1F17" }}
+              contentStyle={{ background: "#181613", border: "1px solid #2E2A25", color: "#ECE6DA" }}
+              labelStyle={{ color: "#ECE6DA" }}
+              itemStyle={{ color: "#F5A800" }}
+            />
+            <Bar dataKey={metricKey} fill="#F5A800" />
           </BarChart>
         </ResponsiveContainer>
       </div>
