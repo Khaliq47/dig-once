@@ -1,8 +1,7 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import AuthButton from "@/components/AuthButton";
 
 const links = [
-  { href: "/search", label: "Find work near me" },
   { href: "/reports", label: "Reports" },
   { href: "/department", label: "Department portal" },
   { href: "/dashboard", label: "Accountability" },
