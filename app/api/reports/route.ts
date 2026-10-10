@@ -1,18 +1,26 @@
 import { NextResponse } from "next/server";
 import { supabaseAsUser, supabaseAdmin } from "@/lib/reports/server";
-import { classifyPhoto } from "@/lib/reports/gemini";
+import { classifyPhoto, type AiResult } from "@/lib/reports/gemini";
 
 const CATEGORIES = ["abandoned", "not_completed", "delay", "poor_quality", "safety", "other"];
 const SOURCES = ["exif", "browser", "manual"];
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+// Never let an unexpected error leave the browser with an empty response.
 export async function POST(req: Request) {
+  try {
+    return await handle(req);
+  } catch (e: any) {
+    return NextResponse.json({ error: e?.message ?? "Server error" }, { status: 500 });
+  }
+}
+
+async function handle(req: Request) {
   const token = req.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
   if (!token) return NextResponse.json({ error: "Log in to submit a report" }, { status: 401 });
 
   let b: any;
   try { b = await req.json(); } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+    return bad("Invalid request");
   }
 
   const lat = Number(b.lat), lng = Number(b.lng);
@@ -24,8 +32,7 @@ export async function POST(req: Request) {
   if (typeof b.note === "string" && b.note.length > 1000) return bad("Note is too long (max 1000 characters)");
 
   // 1) Insert as the user. SQL triggers decide status, distance and duplicates.
-  const asUser = supabaseAsUser(token);
-  const { data: report, error } = await asUser
+  const { data: report, error } = await supabaseAsUser(token)
     .rpc("submit_report", {
       p_project_id: pid,
       p_category: b.category,
@@ -40,21 +47,22 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: error?.message ?? "Could not save the report" }, { status: 400 });
   }
 
-  // 2) Classify the photo once and store the result. Never blocks the report.
-  const admin = supabaseAdmin();
-  let ai: Awaited<ReturnType<typeof classifyPhoto>> = {
-    ai_status: "unclassified", ai_category: null, ai_confidence: null,
-  };
+  // 2) Classify the photo once and store the result. Optional: any failure
+  //    (missing key, Gemini down, timeout) just leaves the report unlabelled.
   const r = report as { id: string; photo_path: string | null };
-  if (r.photo_path) {
-    try {
+  let ai: AiResult | null = null;
+  try {
+    if (r.photo_path && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      const admin = supabaseAdmin();
       const { data: blob } = await admin.storage.from("report-photos").download(r.photo_path);
-      if (blob) ai = await classifyPhoto(await blob.arrayBuffer(), blob.type || "image/jpeg");
-    } catch { /* keep "unclassified" */ }
-  }
-  await admin.from("reports").update(ai).eq("id", r.id);
+      ai = blob
+        ? await classifyPhoto(await blob.arrayBuffer(), blob.type || "image/jpeg")
+        : { ai_status: "unclassified", ai_category: null, ai_confidence: null };
+      await admin.from("reports").update(ai).eq("id", r.id);
+    }
+  } catch { /* keep the report, skip the label */ }
 
-  return NextResponse.json({ ...(report as object), ...ai });
+  return NextResponse.json({ ...(report as object), ...(ai ?? {}) });
 }
 
 function bad(error: string) {
