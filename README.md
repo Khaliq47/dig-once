@@ -4,10 +4,10 @@
 
 Built for the 24-hour Web Development Hackathon, IIITDM Kancheepuram (CivicTech track).
 
-- **Live app:** https://dig-once.vercel.app/
-- **Demo video:** `demo/demo.mp4` (or the link here: `ADD LINK`)
+- **Live app:**  https://dig-once.vercel.app/
+- **Demo video:** https://drive.google.com/file/d/1Du9ztWIUQSoTuTDZnlgmH1ZinfnZ8UCy/view?usp=sharing
 - **Team:** WEBNIX
-- **Team Members:** Krishant(CS25I1053),Sriesh(CS25I1060),Khaliq(CS25B2049),Dakshin(CS25B2048)
+- **Team members:** Krishant (CS25I1053), Sriesh (CS25I1060), Khaliq (CS25B2049), Dakshin (CS25B2048)
 
 ## Demo logins (for judges, no setup needed)
 
@@ -33,12 +33,15 @@ DigOnce gives departments, contractors and residents one shared view of public w
   - **No-dig period:** the road was recently resurfaced.
   - **Wrong work order:** surface work scheduled before underground work.
   - **Bundle opportunity:** nearby work that could be combined, with estimated days saved.
-- **Validation of edge cases:** invalid dates and missing fields are rejected with clear messages.
+- **Validation of edge cases:** invalid dates, missing fields, duplicate submissions and projects that touch no road are rejected with clear messages.
 - **Manage my projects:** departments see and update their own projects.
+- **Stall detection:** a check marks a project as possibly stalled when verified citizen reports disagree with its official status.
 
 ### For residents
 - **Find work near me:** an interactive map using the browser's location to show nearby work.
-- **Reports:** residents submit a photo or complaint about a project. The location is read from the browser or from the photo's EXIF data, and photos are compressed before upload.
+- **Reports with proof:** residents submit a photo or complaint about a project. The location is read from the browser or from the photo's EXIF data, and photos are compressed before upload.
+- **Confirm or dispute:** other residents vote on a report (one vote per user), and a trust score decides when it counts as Verified.
+- **Status trail:** each report moves through Submitted, Verified, Forwarded to department and Resolved, with a timeline.
 - **Location picker:** pin the exact spot of an issue on a map.
 
 ### For everyone
@@ -46,15 +49,16 @@ DigOnce gives departments, contractors and residents one shared view of public w
 
 ## Tech stack
 
-| Area              | Tools                                                                 |
-|-------------------|-----------------------------------------------------------------------|
-| Framework         | Next.js 16 (App Router, Turbopack), React, TypeScript                 |
-| Styling           | Tailwind CSS                                                          |
-| Database and auth | Supabase (Postgres, PostGIS, Row Level Security, Supabase Auth)       |
-| Conflict engine   | A Postgres function (`submit_project`) using PostGIS distance queries |
-| Analytics         | SQL views read by the dashboard                                       |
-| Maps              | Leaflet, react-leaflet, OpenStreetMap tiles                           |
-| Hosting           | Vercel                                                                |
+| Area              | Tools                                                                                              |
+|-------------------|----------------------------------------------------------------------------------------------------|
+| Framework         | Next.js 16 (App Router, Turbopack), React, TypeScript                                              |
+| Styling           | Tailwind CSS                                                                                       |
+| Database and auth | Supabase (Postgres, PostGIS, Row Level Security, Supabase Auth)                                    |
+| Conflict engine   | Postgres functions that validate a project and find conflicts using PostGIS distance queries       |
+| Reports logic     | Postgres triggers and functions for votes, trust score, status trail and stall detection           |
+| Analytics         | SQL views read by the dashboard                                                                    |
+| Maps              | Leaflet, react-leaflet, OpenStreetMap tiles                                                        |
+| Hosting           | Vercel                                                                                             |
 
 ## Open-source libraries and APIs used
 
@@ -74,10 +78,10 @@ All project, report and ranking data in this demo is **simulated** for demonstra
 
 ## Running it locally
 
-**Requirements:** Node.js 20 or newer, and a Supabase project.
+**Requirements:** Node.js 20 or newer.
 
 ```bash
-git clone `ADD REPO URL`
+git clone <your-repo-url>
 cd dig-once
 npm install
 ```
@@ -88,8 +92,6 @@ Create a `.env.local` file in the project root:
 NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
 ```
-
-The database lives in a hosted Supabase project, so judges can use the live app without any setup. The SQL we used is in the `supabase/` folder (see `supabase/NOTE.md` for what each file does). Reports, verification and stall detection are described in `PERSON3_README.md`.
 
 Start the app:
 
@@ -105,6 +107,17 @@ To check a production build:
 npm run build
 ```
 
+## Database
+
+The database runs on a hosted Supabase project, so judges can use the live app without any setup. The SQL behind it is in the [`supabase/`](supabase/) folder:
+
+- `supabase/original/` is the first schema, conflict engine and seed data.
+- `supabase/person3_reports.sql` and `supabase/seed_reports.sql` add reports, votes, the status trail and stall detection. Details are in [`PERSON3_README.md`](PERSON3_README.md).
+- `supabase/04_accountability_views.sql` creates the dashboard views.
+- `supabase/05_current_functions.sql` holds the current code of every database function, including the conflict engine.
+
+See `supabase/NOTE.md` for the order and warnings. To rebuild the database yourself, create a Supabase project, enable the PostGIS extension, and run the files in that folder.
+
 ## Project structure
 
 ```
@@ -117,21 +130,20 @@ app/
   dashboard/      Accountability dashboard
 components/       Shared UI (navbar, footer, charts, report components)
 lib/              Supabase clients and helpers
+supabase/         Database scripts
 ```
 
 ## Team contributions
 
-| Area                                                  | Contributor|
-|-------------------------------------------------------|------------|
-| Database, seed data, conflict engine, department form | `ADD NAME` |
-| Citizen map and search                                | `ADD NAME` |
-| Reports and verification                              | `ADD NAME` |
-| Auth, deployment, accountability dashboard            | `ADD NAME` |
+| Area                                                              | Contributor |
+|-------------------------------------------------------------------|-------------|
+| Database, seed data, conflict engine, department submission form  | Dakshin     |
+| Citizen map and search                                            | Krishant    |
+| Reports, verification and stall detection                         | Khaliq      |
+| Auth, deployment, accountability dashboard                        | Sriesh      |
 
 ## Limitations and future work
 
 - Rankings currently use demo values. The next step is calculating them directly from live project data.
 - The "Find work near me" map currently shows sample pins and should be connected to the real projects table.
-- Planned: notifications for followed areas, stall detection from verified citizen reports, and AI-generated summaries in Tamil and English.
-
-
+- Planned: notifications for followed areas and AI-generated summaries in Tamil and English.
