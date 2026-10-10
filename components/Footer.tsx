@@ -12,7 +12,6 @@ export default function Footer() {
           </p>
         </div>
         <nav className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
-          <Link href="/map" className="underline-offset-4 hover:underline">Map</Link>
           <Link href="/search" className="underline-offset-4 hover:underline">Find work near me</Link>
           <Link href="/dashboard" className="underline-offset-4 hover:underline">Accountability</Link>
           <Link href="/login" className="underline-offset-4 hover:underline">Login</Link>

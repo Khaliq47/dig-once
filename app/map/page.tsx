@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+
 export default function Page() {
-  return <main className="p-6">Map (Krishant)</main>;
+  redirect("/search");
 }

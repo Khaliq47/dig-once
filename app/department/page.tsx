@@ -290,7 +290,7 @@ export default function DepartmentPage() {
           )}
           {successId !== null && (
             <p className="border-l-4 border-done px-3 py-2 text-sm text-done">
-              Project submitted (#{successId}). <Link href="/map" className="underline">View on the map</Link>
+              Project submitted (#{successId}). <Link href="/department/manage" className="underline">View my projects</Link>
             </p>
           )}
 
