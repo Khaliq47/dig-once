@@ -1,156 +1,176 @@
-
 "use client";
 
-import { useEffect, useState } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMap,
-} from "react-leaflet";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { supabase } from "@/lib/supabase";
 
-type WorkLocation = {
+type Props = {
   id: number;
-  name: string;
-  lat: number;
-  lng: number;
-  description: string;
+  title: string;
+  department: string;
+  contractor: string | null;
+  type: string;
+  status: string;
+  start_date: string;
+  end_date: string;
 };
 
-const workLocations: WorkLocation[] = [
-  {
-    id: 1,
-    name: "Sample Digging Site",
-    lat: 13.0827,
-    lng: 80.2707,
-    description: "Example work location in Chennai",
-  },
-  {
-    id: 2,
-    name: "Sample Utility Work",
-    lat: 13.0569,
-    lng: 80.2425,
-    description: "Example utility work location",
-  },
-];
+type Feature = {
+  type: "Feature";
+  geometry: GeoJSON.Geometry;
+  properties: Props;
+};
 
-function FixMapSize() {
-  const map = useMap();
+const STATUS_COLOR: Record<string, string> = {
+  planned: "#2563eb",
+  ongoing: "#f59e0b",
+  delayed: "#dc2626",
+  completed: "#16a34a",
+  possibly_stalled: "#9333ea",
+};
 
-  useEffect(() => {
-    const timer = setTimeout(() => map.invalidateSize(), 100);
-    return () => clearTimeout(timer);
-  }, [map]);
+const STATUS_OPTIONS = ["all", "planned", "ongoing", "delayed", "completed", "possibly_stalled"];
 
-  return null;
+function esc(s: unknown) {
+  return String(s ?? "").replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c] as string
+  );
 }
 
 export default function MapView() {
-  const [position, setPosition] = useState<[number, number] | null>(null);
-  const [gpsError, setGpsError] = useState("");
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const layerRef = useRef<L.GeoJSON | null>(null);
+  const [features, setFeatures] = useState<Feature[]>([]);
+  const [filter, setFilter] = useState("all");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [gps, setGps] = useState("");
 
+  // create the map once
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setGpsError("Geolocation is not supported by this browser.");
-      return;
+    if (!containerRef.current || mapRef.current) return;
+    const map = L.map(containerRef.current).setView([12.937, 77.62], 14);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+    }).addTo(map);
+    mapRef.current = map;
+
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          L.circleMarker([pos.coords.latitude, pos.coords.longitude], {
+            radius: 8,
+            color: "#fff",
+            weight: 3,
+            fillColor: "#2563eb",
+            fillOpacity: 1,
+          })
+            .addTo(map)
+            .bindPopup("You are here.");
+          setGps("Blue dot: your location.");
+        },
+        () => setGps("Location not shared. Allow location access to see where you are."),
+        { timeout: 10000 }
+      );
     }
 
-    const watchId = navigator.geolocation.watchPosition(
-      (location) => {
-        setPosition([
-          location.coords.latitude,
-          location.coords.longitude,
-        ]);
-        setGpsError("");
-      },
-      () => {
-        setGpsError(
-          "Location unavailable. Allow location access in your browser."
-        );
-      },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 5000,
-        timeout: 15000,
-      }
-    );
-
-    return () => navigator.geolocation.clearWatch(watchId);
+    return () => {
+      map.remove();
+      mapRef.current = null;
+      layerRef.current = null;
+    };
   }, []);
 
-  const userIcon = L.divIcon({
-    className: "user-location-icon",
-    html: '<div style="width:18px;height:18px;background:#2563eb;border:3px solid white;border-radius:50%;box-shadow:0 0 0 7px #2563eb33"></div>',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-  });
+  // load projects from the database
+  useEffect(() => {
+    async function load() {
+      const { data, error } = await supabase.rpc("projects_geojson");
+      if (error) {
+        setError("Could not load projects: " + error.message);
+      } else {
+        setFeatures(((data as { features?: Feature[] })?.features ?? []) as Feature[]);
+      }
+      setLoading(false);
+    }
+    load();
+  }, []);
 
-  const workIcon = L.divIcon({
-    className: "work-location-icon",
-    html: '<div style="width:18px;height:18px;background:#dc2626;border:3px solid white;border-radius:50%;box-shadow:0 1px 5px #555"></div>',
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-  });
+  // draw projects whenever data or filter changes
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (layerRef.current) {
+      layerRef.current.remove();
+      layerRef.current = null;
+    }
+    const shown = features.filter((f) => filter === "all" || f.properties.status === filter);
+    if (shown.length === 0) return;
+
+    const colorOf = (f?: Feature) => STATUS_COLOR[f?.properties.status ?? ""] ?? "#6b7280";
+    const layer = L.geoJSON(shown as unknown as GeoJSON.FeatureCollection, {
+      style: (f) => ({ color: colorOf(f as unknown as Feature), weight: 6, opacity: 0.9 }),
+      pointToLayer: (f, latlng) =>
+        L.circleMarker(latlng, {
+          radius: 8,
+          color: "#fff",
+          weight: 2,
+          fillColor: colorOf(f as unknown as Feature),
+          fillOpacity: 1,
+        }),
+      onEachFeature: (f, l) => {
+        const p = (f as unknown as Feature).properties;
+        l.bindPopup(
+          `<strong>${esc(p.title)}</strong><br/>` +
+            `${esc(p.department)}${p.contractor ? ", " + esc(p.contractor) : ""}<br/>` +
+            `${esc(p.start_date)} to ${esc(p.end_date)}<br/>` +
+            `Status: ${esc(String(p.status).replace("_", " "))}<br/>` +
+            `<a href="/projects/${esc(p.id)}" style="text-decoration:underline">View project details</a>`
+        );
+      },
+    }).addTo(map);
+    layerRef.current = layer;
+
+    const bounds = layer.getBounds();
+    if (bounds.isValid()) map.fitBounds(bounds, { padding: [30, 30], maxZoom: 16 });
+  }, [features, filter]);
+
+  const count = features.filter((f) => filter === "all" || f.properties.status === filter).length;
 
   return (
-    <section className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold">Live Work Map</h1>
-        <p className="text-sm text-gray-600">
-          Blue marker: your location · Red markers: work locations
-        </p>
-      </div>
-
-      {gpsError && (
-        <p className="rounded bg-amber-100 p-3 text-sm text-amber-900">
-          {gpsError}
-        </p>
-      )}
-
-      <div className="h-[65vh] min-h-[400px] w-full overflow-hidden rounded-xl border">
-        <MapContainer
-          center={[13.0827, 80.2707]}
-          zoom={12}
-          scrollWheelZoom
-          style={{ height: "100%", width: "100%" }}
-        >
-          <FixMapSize />
-
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-
-          {workLocations.map((work) => (
-            <Marker
-              key={work.id}
-              position={[work.lat, work.lng]}
-              icon={workIcon}
-            >
-              <Popup>
-                <strong>{work.name}</strong>
-                <br />
-                {work.description}
-              </Popup>
-            </Marker>
+    <section className="space-y-3">
+      <div className="flex flex-wrap items-center gap-3 text-sm">
+        <label>
+          Status{" "}
+          <select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="rounded-sm border border-line bg-white px-2 py-1"
+          >
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s.replace("_", " ")}
+              </option>
+            ))}
+          </select>
+        </label>
+        <span className="text-muted">{loading ? "Loading projects..." : `${count} projects shown`}</span>
+        <span className="flex flex-wrap gap-3 text-xs text-muted">
+          {Object.entries(STATUS_COLOR).map(([s, c]) => (
+            <span key={s} className="flex items-center gap-1">
+              <span style={{ background: c }} className="inline-block h-3 w-3 rounded-full" />
+              {s.replace("_", " ")}
+            </span>
           ))}
-
-          {position && (
-            <Marker position={position} icon={userIcon}>
-              <Popup>You are here.</Popup>
-            </Marker>
-          )}
-        </MapContainer>
+        </span>
       </div>
 
-      <p className="text-sm text-gray-600">
-        {position
-          ? `GPS active: ${position[0].toFixed(5)}, ${position[1].toFixed(5)}`
-          : "Waiting for GPS permission..."}
-      </p>
+      {error && <p className="border-l-4 border-delayed bg-white px-3 py-2 text-sm text-delayed">{error}</p>}
+      {gps && <p className="text-xs text-muted">{gps}</p>}
+
+      <div ref={containerRef} className="h-[65vh] min-h-[400px] w-full overflow-hidden border border-line" />
     </section>
   );
 }
