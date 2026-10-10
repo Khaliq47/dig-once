@@ -2,7 +2,6 @@
 import AuthButton from "@/components/AuthButton";
 
 const links = [
-  { href: "/map", label: "Map" },
   { href: "/reports", label: "Reports" },
   { href: "/department", label: "Department portal" },
   { href: "/dashboard", label: "Accountability" },

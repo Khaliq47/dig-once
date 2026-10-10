@@ -1,12 +1,10 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const DEMO_PASSWORD = "demo123456";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,18 +19,20 @@ export default function LoginPage() {
       setError(error.message);
       return;
     }
-    router.push(redirectTo);
-    router.refresh();
+    window.location.assign(redirectTo);
   }
 
   return (
     <main className="mx-auto max-w-md p-6">
-      <h1 className="mb-4 font-display text-4xl font-bold">Login</h1>
+      <h1 className="mb-2 font-display text-4xl font-bold">Login</h1>
+      <p className="mb-4 text-sm text-muted">
+        Residents can browse without logging in. The department portal needs a department account, so use the demo button below.
+      </p>
 
       <div className="mb-6 flex flex-col gap-2">
         <button
           disabled={loading}
-          onClick={() => signIn("citizen@demo.com", DEMO_PASSWORD, "/map")}
+          onClick={() => signIn("citizen@demo.com", DEMO_PASSWORD, "/search")}
           className="rounded-sm bg-ink px-4 py-2 font-medium text-white disabled:opacity-50"
         >
           Login as Citizen (demo)

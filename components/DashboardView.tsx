@@ -3,7 +3,7 @@ import { useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid,
 } from "recharts";
-import type { AccountabilityRow } from "@/lib/dummy-accountability";
+import type { AccountabilityRow } from "@/lib/accountability";
 
 const metrics = [
   { key: "onTimeRate", label: "On-time rate (%)", higherIsBetter: true },
